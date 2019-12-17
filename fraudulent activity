@@ -1,0 +1,107 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    // Complete the activityNotifications function below.
+   static int activityNotifications(int[] expenditure, int d) {
+        int n=expenditure.length;
+        int notification=0;
+        boolean firstTime =true;
+        int[] freq=new int[201];
+        int remove=0;
+        for(int i=d;i<n;i++){
+            if(firstTime){
+                firstTime=false;
+                for(int j=i-d;j<i;j++)
+                freq[expenditure[j]]++;
+            }       
+            else{
+                freq[remove]--;
+                freq[expenditure[i-1]]++;
+            }
+            int median =getmedian(freq,d);
+            if(d%2==0){
+                if(expenditure[i] >= median)
+                notification++;
+            }
+            else{ 
+                if(expenditure[i] >= 2*median)
+            notification++;
+            }
+            remove=expenditure[i-d];
+        }
+    return notification;
+    }
+    static int getmedian(int    freq[],int d){
+        int presum[]=new int[201];
+        presum[0] = freq[0];
+        for(int i=1;i<201;i++){
+        presum[i] = presum[i-1]+freq[i];
+        }
+        int a=0;
+        int b=0;
+        if(d%2==0){
+            int first=d/2;
+            int second=first+1;
+            int i;
+            for(i=0;i<201;i++){
+                if(first<=presum[i]){
+                    a=i;
+                    break;
+                }
+            }
+            for(;i<201;i++){
+                if(second<=presum[i]){
+                    b=i;
+                    break;
+                }
+            }
+        }
+        else{
+            int first=d/2+1;
+            for(int i=0;i<presum.length;i++){
+                if(first<=presum[i]){
+                    a=i;
+                    break;
+                }
+            }
+        }
+        return a+b;
+    }
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        String[] nd = scanner.nextLine().split(" ");
+
+        int n = Integer.parseInt(nd[0]);
+
+        int d = Integer.parseInt(nd[1]);
+
+        int[] expenditure = new int[n];
+
+        String[] expenditureItems = scanner.nextLine().split(" ");
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+        for (int i = 0; i < n; i++) {
+            int expenditureItem = Integer.parseInt(expenditureItems[i]);
+            expenditure[i] = expenditureItem;
+        }
+
+        int result = activityNotifications(expenditure, d);
+
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+
+        bufferedWriter.close();
+
+        scanner.close();
+    }
+}
